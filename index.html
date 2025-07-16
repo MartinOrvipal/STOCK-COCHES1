@@ -183,6 +183,7 @@
       detectRetina: true
     }).addTo(mapa);
 
+    // STOCK COCHES
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRo1GdeHBhvINfcrAmPKvUmgU2jAIThFYNSg_TjOd3w-MyKe3gmzxEft6wz6-CN3WSsTpEgq1TabODC/pub?gid=0&single=true&output=csv';
 
     fetch(CSV_URL)
@@ -217,7 +218,6 @@
 
           if (!isNaN(lat) && !isNaN(lon)) {
             let claseZaragoza = ciudad === 'zaragoza' ? ' sin-logo' : '';
-            
             let html = `
               <div class='popup-content ${bgClass}'>
                 <div class='marca-logo${claseZaragoza}'>
@@ -226,13 +226,10 @@
             if (ciudad !== 'zaragoza') {
               html += `<img src="${logo}" alt="logo">`;
             } else {
-              // Logo invisible con ancho colapsado pero mantiene altura
               html += `<img src="#" alt="" style="opacity:0; width:1px; height:20px; margin-right:0;">`;
             }
 
-            html += `
-                    <strong>${marca}</strong>
-                  </div>
+            html += `<strong>${marca}</strong></div>
                   <div class="stock">${stock}</div>
                 </div>
               </div>`;
@@ -250,7 +247,8 @@
           }
         });
       });
-    
+
+    // CAMIONES Y CARGAS AGENCIA
     const CAMIONES_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRo1GdeHBhvINfcrAmPKvUmgU2jAIThFYNSg_TjOd3w-MyKe3gmzxEft6wz6-CN3WSsTpEgq1TabODC/pub?gid=614991280&single=true&output=csv';
 
     fetch(CAMIONES_CSV)
@@ -261,9 +259,24 @@
         const camiones = lines.map(row => Object.fromEntries(headers.map((h, i) => [h, row[i]?.trim() || ""])));
 
         const contenedor = document.getElementById("camion-container");
+
         camiones.forEach(camion => {
-          const provinciaOriginal = camion.PROVINCIA;
-          let nombreArchivo = provinciaOriginal.toLowerCase();
+          const provincia = camion.PROVINCIA?.toLowerCase();
+          const numCamiones = camion['Nº CAMIONES'];
+
+          if (provincia === 'cargas agencia') {
+            const divAgencia = document.createElement("div");
+            divAgencia.className = "agencia-card";
+            divAgencia.innerHTML = `
+              <img class="camion-icon" src="assets/agencia-icon.png" alt="Cargas Agencia">
+              <span class="provincia">CARGAS AGENCIA</span>
+              <span class="cantidad">: ${numCamiones}</span>
+            `;
+            document.getElementById("agencia-card").appendChild(divAgencia);
+            return;
+          }
+
+          let nombreArchivo = provincia;
           if (nombreArchivo.includes('vall')) {
             nombreArchivo = 'val-pal';
           } else {
@@ -271,69 +284,19 @@
           }
 
           const icono = `assets/camion-${nombreArchivo}.png`;
-          const numCamiones = camion['Nº CAMIONES'];
 
           const div = document.createElement("div");
           div.className = "camion-card";
           div.innerHTML = `
-            <img class="camion-icon" src="${icono}" alt="Camion ${provinciaOriginal}">
-            <span class="provincia">${provinciaOriginal}</span>
+            <img class="camion-icon" src="${icono}" alt="Camion ${camion.PROVINCIA}">
+            <span class="provincia">${camion.PROVINCIA}</span>
             <span class="cantidad">: ${numCamiones}</span>
           `;
           contenedor.appendChild(div);
         });
       });
 
-    // MOSTRAR TOTAL DE CARGAS AGENCIA DESDE LA MISMA HOJA
-    fetch(CAMIONES_CSV)
-      .then(resp => resp.text())
-      .then(text => {
-        const lines = text.trim().split('\n').map(l => l.split(','));
-        const headers = lines.shift().map(h => h.trim());
-        const camiones = lines.map(row => Object.fromEntries(headers.map((h, i) => [h, row[i]?.trim() || ""])));
-
-        // Mostrar lista de camiones por provincia
-        const contenedor = document.getElementById("camion-container");
-        camiones.forEach(camion => {
-          const provinciaOriginal = camion.PROVINCIA;
-          if (!provinciaOriginal || provinciaOriginal.toLowerCase() === "cargas agencia") return; // Saltar la fila especial
-
-          let nombreArchivo = provinciaOriginal.toLowerCase();
-          if (nombreArchivo.includes('vall')) {
-            nombreArchivo = 'val-pal';
-          } else {
-            nombreArchivo = nombreArchivo.replace(/[\s./]+/g, "-");
-          }
-
-          const icono = `assets/camion-${nombreArchivo}.png`;
-          const numCamiones = camion['Nº CAMIONES'];
-
-          const div = document.createElement("div");
-          div.className = "camion-card";
-          div.innerHTML = `
-            <img class="camion-icon" src="${icono}" alt="Camion ${provinciaOriginal}">
-            <span class="provincia">${provinciaOriginal}</span>
-            <span class="cantidad">: ${numCamiones}</span>
-          `;
-          contenedor.appendChild(div);
-        });
-
-        // Buscar la fila con "CARGAS AGENCIA"
-        const filaAgencia = camiones.find(c => c.PROVINCIA?.toLowerCase() === "cargas agencia");
-        if (filaAgencia) {
-          const divAgencia = document.createElement("div");
-          divAgencia.className = "agencia-card";
-          divAgencia.innerHTML = `
-            <img class="camion-icon" src="assets/agencia-icon.png" alt="Cargas Agencia">
-            <span class="provincia">CARGAS AGENCIA</span>
-            <span class="cantidad">: ${filaAgencia['Nº CAMIONES']}</span>
-          `;
-          // Insertar arriba del todo
-          document.getElementById("agencia-card").appendChild(divAgencia);
-        }
-      });
-    
-    setTimeout(() => location.reload(), 300000);    
+    setTimeout(() => location.reload(), 300000);
   </script>
 </body>
 </html>
