@@ -144,6 +144,9 @@
 
             if (ciudad !== 'zaragoza') {
               html += `<img src="${logo}" alt="logo">`;
+            } else {
+              // Imagen invisible del mismo tamaño para mantener altura
+              html += `<img src="" style="width:20px; height:20px; visibility:hidden;" alt="">`;
             }
 
             html += `
