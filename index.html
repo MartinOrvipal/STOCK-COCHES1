@@ -160,8 +160,7 @@
     /* Versión extrema optimizada para TV Bro */
     @media screen and (max-width: 1024px) {
           .tvbro #map {
-            transform: scale(0.85);
-            transform-origin: top left;
+            zoom: 0.85;
           }
       
         .tvbro .popup-content {
@@ -209,7 +208,6 @@
   <script>
     const isTVBro = /tv bro/i.test(navigator.userAgent);
     if (isTVBro) document.body.classList.add("tvbro");
-  </script>
   
     const mapa = L.map('map', {
       center: isTVBro ? [40.3, -3.5] : [40.5, -3.5],
