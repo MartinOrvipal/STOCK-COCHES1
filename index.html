@@ -65,6 +65,15 @@
       padding: 0 !important;
     }
 
+    .marca-logo.sin-logo {
+      justify-content: flex-start;
+      gap: 0;
+    }
+
+    .marca-logo.sin-logo .info-marca {
+      margin-right: 0;
+    }
+
     .bg-barcelona   { background-color: #3c78d8; }
     .bg-valencia    { background-color: #38761d; }
     .bg-madrid      { background-color: #f1c232; }
@@ -137,16 +146,15 @@
           const lon = parseFloat(fila.LONGITUD.replace(",", "."));
 
           if (!isNaN(lat) && !isNaN(lon)) {
+            let claseZaragoza = ciudad === 'zaragoza' ? ' sin-logo' : '';
+            
             let html = `
               <div class='popup-content ${bgClass}'>
-                <div class='marca-logo'>
+                <div class='marca-logo${claseZaragoza}'>
                   <div class="info-marca">`;
 
             if (ciudad !== 'zaragoza') {
               html += `<img src="${logo}" alt="logo">`;
-            } else {
-              // Imagen invisible del mismo tamaño para mantener altura
-              html += `<img src="" style="width:20px; height:20px; visibility:hidden;" alt="">`;
             }
 
             html += `
