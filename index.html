@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="color-scheme" content="light only">
   <title>Mapa de Stock de Coches</title><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -159,10 +160,6 @@
 
     /* Versión extrema optimizada para TV Bro */
     @media screen and (max-width: 1024px) {
-          .tvbro #map {
-            zoom: 0.85;
-          }
-      
         .tvbro .popup-content {
           font-size: 2.8px !important;
           max-width: 65px !important;
@@ -196,7 +193,7 @@
           width: 12px !important;
           height: 12px !important;
         }
-    
+    }
   </style>
 </head>
 <body>
@@ -206,21 +203,20 @@
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    const isTVBro = /tv bro/i.test(navigator.userAgent);
-    if (isTVBro) document.body.classList.add("tvbro");
-  
     const mapa = L.map('map', {
-      center: isTVBro ? [40.3, -3.5] : [40.5, -3.5],
-      zoom: isTVBro ? 5.6 : 7.2,
-      zoomControl: false,
-      attributionControl: false,
-      dragging: false,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
-      boxZoom: false,
-      keyboard: false,
-      touchZoom: false
+      zoomControl: true,
+      attributionControl: false
     });
+
+    const isTVBro = navigator.userAgent.toLowerCase().includes("tv bro");
+    if (isTVBro) {
+      document.body.classList.add("tvbro");
+    }
+
+    const center = isTVBro ? [40.5, -3.5] : [40.5, -3.5];  // Centrado en el centro de España
+    const zoom = isTVBro ? 6.2 : 6.2;  // Zoom adecuado para ver toda España sin cortar provincias
+    
+    mapa.setView(center, zoom);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       detectRetina: true
