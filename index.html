@@ -84,86 +84,11 @@
     .bg-holanda     { background-color: #7bcb06; }
     .bg-francia     { background-color: #5800ff; }
     .bg-creutzwald  { background-color: #5800ff; }
-
-    #camion-container {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 1000;
-    }
-
-    .camion-card {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: white;
-      border-radius: 12px;
-      padding: 8px 14px;
-      font-size: 15px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.15);
-      color: black;
-    }
-
-    .camion-icon {
-      width: 26px;
-      height: 26px;
-      flex-shrink: 0;
-    }
-
-    .provincia {
-      font-weight: 600;
-      font-size: 16px;
-    }
-
-    .cantidad {
-      margin-left: auto;
-      font-weight: 500;
-    }
-
-    /* Versión extrema optimizada para TV Bro */
-    @media screen and (max-width: 1024px) {
-        .tvbro .popup-content {
-          font-size: 2.8px !important;
-          max-width: 65px !important;
-          padding: 0.5px 0.5px !important;
-          line-height: 1 !important;
-        }
-
-        .tvbro .marca-logo img {
-          width: 5px !important;
-          height: 5px !important;
-          margin-right: 1px !important;
-        }
-
-        .tvbro .stock {
-          font-size: 3.2px !important;
-          padding-left: 2px !important;
-        }
-
-        .tvbro .camion-card {
-          font-size: 6px !important;
-          padding: 2px 4px !important;
-          gap: 3px !important;
-        }
-
-        .tvbro .provincia,
-        .tvbro .cantidad {
-          font-size: 6px !important;
-        }
-
-        .tvbro .camion-icon {
-          width: 12px !important;
-          height: 12px !important;
-        }
-    }
+    .bg-zaragoza    { background-color: #a64d79; }
   </style>
 </head>
 <body>
   <div id="map"></div>
-  <div id="camion-container"></div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
@@ -172,15 +97,8 @@
       attributionControl: false
     });
 
-    const isTVBro = navigator.userAgent.toLowerCase().includes("tv bro");
-    if (isTVBro) {
-      document.body.classList.add("tvbro");
-    }
-
-    const center = isTVBro ? [40.5, -3.5] : [40.5, -3.5];  // Centrado en el centro de España
-    const zoom = isTVBro ? 6.2 : 6.2;  // Zoom adecuado para ver toda España sin cortar provincias
-    
-    mapa.setView(center, zoom);
+    const center = [40.5, -3.5];
+    mapa.setView(center, 6.2);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       detectRetina: true
@@ -209,6 +127,7 @@
             case 'madriid':   bgClass = 'bg-madriid'; break;
             case 'vigo':      bgClass = 'bg-vigo'; break;
             case 'barcelona': bgClass = 'bg-barcelona'; break;
+            case 'zaragoza':  bgClass = 'bg-zaragoza'; break;
           }
 
           const marca = fila.MARCA;
@@ -218,16 +137,22 @@
           const lon = parseFloat(fila.LONGITUD.replace(",", "."));
 
           if (!isNaN(lat) && !isNaN(lon)) {
-            const html = `
+            let html = `
               <div class='popup-content ${bgClass}'>
                 <div class='marca-logo'>
-                  <div class="info-marca">
-                    <img src="${logo}" alt="logo">
+                  <div class="info-marca">`;
+
+            if (ciudad !== 'zaragoza') {
+              html += `<img src="${logo}" alt="logo">`;
+            }
+
+            html += `
                     <strong>${marca}</strong>
                   </div>
                   <div class="stock">${stock}</div>
                 </div>
               </div>`;
+
             L.tooltip({
               permanent: true,
               direction: "top",
@@ -241,42 +166,6 @@
           }
         });
       });
-
-    const CAMIONES_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRo1GdeHBhvINfcrAmPKvUmgU2jAIThFYNSg_TjOd3w-MyKe3gmzxEft6wz6-CN3WSsTpEgq1TabODC/pub?gid=614991280&single=true&output=csv';
-
-    fetch(CAMIONES_CSV)
-      .then(resp => resp.text())
-      .then(text => {
-        const lines = text.trim().split('\n').map(l => l.split(','));
-        const headers = lines.shift().map(h => h.trim());
-        const camiones = lines.map(row => Object.fromEntries(headers.map((h, i) => [h, row[i]?.trim() || ""])));
-
-        const contenedor = document.getElementById("camion-container");
-        camiones.forEach(camion => {
-          const provinciaOriginal = camion.PROVINCIA;
-          let nombreArchivo = provinciaOriginal.toLowerCase();
-          if (nombreArchivo.includes('vall')) {
-            nombreArchivo = 'val-pal';
-          } else {
-            nombreArchivo = nombreArchivo.replace(/[\s./]+/g, "-");
-          }
-
-          const icono = `assets/camion-${nombreArchivo}.png`;
-          const numCamiones = camion['Nº CAMIONES'];
-
-          const div = document.createElement("div");
-          div.className = "camion-card";
-          div.innerHTML = `
-            <img class="camion-icon" src="${icono}" alt="Camion ${provinciaOriginal}">
-            <span class="provincia">${provinciaOriginal}</span>
-            <span class="cantidad">: ${numCamiones}</span>
-          `;
-          contenedor.appendChild(div);
-        });
-      });
-
-    setTimeout(() => location.reload(), 300000);
   </script>
 </body>
 </html>
-
