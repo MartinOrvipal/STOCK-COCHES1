@@ -102,12 +102,17 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     const mapa = L.map('map', {
-      zoomControl: true,
-      attributionControl: false
+      center: [40.5, -3.5],
+      zoom: 6.2,
+      zoomControl: false,
+      attributionControl: false,
+      dragging: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      boxZoom: false,
+      keyboard: false,
+      touchZoom: false
     });
-
-    const center = [40.5, -3.5];
-    mapa.setView(center, 6.2);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       detectRetina: true
