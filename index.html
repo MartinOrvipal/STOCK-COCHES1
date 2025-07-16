@@ -132,11 +132,37 @@
       margin-left: auto;
       font-weight: 500;
     }    
+
+    #agencia-card {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+    }
+
+    .agencia-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: 15px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.15);
+      color: black;
+      font-weight: 600;
+    }
+
+    .agencia-icon {
+      width: 26px;
+      height: 26px;
+    }  
   </style>
 </head>
 <body>
   <div id="map"></div>
   <div id="camion-container"></div>
+  <div id="agencia-card"></div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
@@ -256,6 +282,55 @@
           `;
           contenedor.appendChild(div);
         });
+      });
+
+    // MOSTRAR TOTAL DE CARGAS AGENCIA DESDE LA MISMA HOJA
+    fetch(CAMIONES_CSV)
+      .then(resp => resp.text())
+      .then(text => {
+        const lines = text.trim().split('\n').map(l => l.split(','));
+        const headers = lines.shift().map(h => h.trim());
+        const camiones = lines.map(row => Object.fromEntries(headers.map((h, i) => [h, row[i]?.trim() || ""])));
+
+        // Mostrar lista de camiones por provincia
+        const contenedor = document.getElementById("camion-container");
+        camiones.forEach(camion => {
+          const provinciaOriginal = camion.PROVINCIA;
+          if (!provinciaOriginal || provinciaOriginal.toLowerCase() === "cargas agencia") return; // Saltar la fila especial
+
+          let nombreArchivo = provinciaOriginal.toLowerCase();
+          if (nombreArchivo.includes('vall')) {
+            nombreArchivo = 'val-pal';
+          } else {
+            nombreArchivo = nombreArchivo.replace(/[\s./]+/g, "-");
+          }
+
+          const icono = `assets/camion-${nombreArchivo}.png`;
+          const numCamiones = camion['Nº CAMIONES'];
+
+          const div = document.createElement("div");
+          div.className = "camion-card";
+          div.innerHTML = `
+            <img class="camion-icon" src="${icono}" alt="Camion ${provinciaOriginal}">
+            <span class="provincia">${provinciaOriginal}</span>
+            <span class="cantidad">: ${numCamiones}</span>
+          `;
+          contenedor.appendChild(div);
+        });
+
+        // Buscar la fila con "CARGAS AGENCIA"
+        const filaAgencia = camiones.find(c => c.PROVINCIA?.toLowerCase() === "cargas agencia");
+        if (filaAgencia) {
+          const divAgencia = document.createElement("div");
+          divAgencia.className = "agencia-card";
+          divAgencia.innerHTML = `
+            <img class="camion-icon" src="assets/agencia-icon.png" alt="Cargas Agencia">
+            <span class="provincia">CARGAS AGENCIA</span>
+            <span class="cantidad">: ${filaAgencia['Nº CAMIONES']}</span>
+          `;
+          // Insertar arriba del todo
+          document.getElementById("agencia-card").appendChild(divAgencia);
+        }
       });
     
     setTimeout(() => location.reload(), 300000);    
