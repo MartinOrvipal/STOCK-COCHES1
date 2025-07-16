@@ -161,7 +161,6 @@
     /* Versión extrema optimizada para TV Bro */
     @media screen and (max-width: 1024px) {
         .tvbro #map {
-          transform: scale(0.85);
           transform-origin: top left;
           width: 120%;
           height: 100;
@@ -210,19 +209,23 @@
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    const isTVBro = navigator.userAgent.toLowerCase().includes("tv bro");
+    const isTVBro = /tv bro/i.test(navigator.userAgent);
 
+    if (isTVBro) {
+      document.body.classList.add("tvbro");
+    }
+  
     const mapa = L.map('map', {
-      center: [40.5, -3.5],
-      zoom: isTVBro ? 6.0 : 7.2,
+      center: isTVBro ? [40.3, -3.5] : [40.5, -3.5],
+      zoom: isTVBro ? 5.6 : 7.2,
       zoomControl: false,
       attributionControl: false,
-      dragging: !isTVBro,
-      scrollWheelZoom: !isTVBro,
-      doubleClickZoom: !isTVBro,
+      dragging: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
       boxZoom: false,
       keyboard: false,
-      touchZoom: !isTVBro
+      touchZoom: false
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
