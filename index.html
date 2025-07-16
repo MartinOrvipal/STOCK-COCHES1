@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="color-scheme" content="light only">
-  <title>Mapa de Stock de Coches</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa de Stock de Coches</title><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -160,11 +159,10 @@
 
     /* Versión extrema optimizada para TV Bro */
     @media screen and (max-width: 1024px) {
-        .tvbro #map {
-          transform-origin: top left;
-          width: 120%;
-          height: 100;
-        }
+          .tvbro #map {
+            transform: scale(0.85);
+            transform-origin: top left;
+          }
       
         .tvbro .popup-content {
           font-size: 2.8px !important;
@@ -210,10 +208,8 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     const isTVBro = /tv bro/i.test(navigator.userAgent);
-
-    if (isTVBro) {
-      document.body.classList.add("tvbro");
-    }
+    if (isTVBro) document.body.classList.add("tvbro");
+  </script>
   
     const mapa = L.map('map', {
       center: isTVBro ? [40.3, -3.5] : [40.5, -3.5],
