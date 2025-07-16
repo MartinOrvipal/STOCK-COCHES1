@@ -210,17 +210,19 @@
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
+    const isTVBro = navigator.userAgent.toLowerCase().includes("tv bro");
+
     const mapa = L.map('map', {
       center: [40.5, -3.5],
-      zoom: 7.2,
+      zoom: isTVBro ? 6.0 : 7.2,
       zoomControl: false,
-      attributionControl: true,
-      dragging: true,
-      scrollWheelZoom: true,
-      doubleClickZoom: true,
+      attributionControl: false,
+      dragging: !isTVBro,
+      scrollWheelZoom: !isTVBro,
+      doubleClickZoom: !isTVBro,
       boxZoom: false,
       keyboard: false,
-      touchZoom: false
+      touchZoom: !isTVBro
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
